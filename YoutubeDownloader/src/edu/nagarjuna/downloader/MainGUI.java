@@ -23,6 +23,7 @@ public class MainGUI {
     private JTextField downloadUrlField;
 
     private JPanel jPanelOne;
+    private JProgressBar downloadProgress;
 
     MainGUI(){
         loadGUIComponents();
@@ -39,16 +40,19 @@ public class MainGUI {
             startDownload(userText);
             JOptionPane.showMessageDialog(jFrame,"User input : "+userText);
         });
-
+        downloadProgress = new JProgressBar();
+        downloadProgress.setString("20");
         jPanelOne = new JPanel();
         jPanelOne.add(textBoxLabel);
         jPanelOne.add(downloadUrlField);
+
         jPanelOne.setLayout(new GridLayout(1,1));
 
         jFrame.add(jPanelOne);
         jFrame.add(downloadBtm);
+        jFrame.add(downloadProgress);
 
-        jFrame.setLayout(new GridLayout(3,1));
+        jFrame.setLayout(new GridLayout(4,1));
 
         jFrame.setVisible(true);
 
