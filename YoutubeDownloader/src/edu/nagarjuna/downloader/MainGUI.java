@@ -41,7 +41,9 @@ public class MainGUI {
             JOptionPane.showMessageDialog(jFrame,"User input : "+userText);
         });
         downloadProgress = new JProgressBar();
-        downloadProgress.setString("20");
+        downloadProgress.setMaximum(100);
+        downloadProgress.setMinimum(0);
+        downloadProgress.setValue(50);
         jPanelOne = new JPanel();
         jPanelOne.add(textBoxLabel);
         jPanelOne.add(downloadUrlField);
@@ -86,22 +88,36 @@ public class MainGUI {
         }
     }
 
-    private void getFileTotalSize(URL url) {
+    private float getFileTotalSize(URL url,String expectedOutput) {
+        //expectedoutput = mb, kb, gb
         HttpURLConnection httpURLConnection;
         try {
             httpURLConnection = (HttpURLConnection) url.openConnection();
             long length = httpURLConnection.getContentLengthLong();
-            System.out.println("The size of the file is "+ length);
+            return getSize(length,expectedOutput);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
     }
 
-    public static void main(String[] args) {
-//       String downloadUrl =  "https://az764295.vo.msecnd.net/stable/e2816fe719a4026ffa1ee0189dc89bdfdbafb164/VSCodeUserSetup-x64-1.75.0.exe";
+    private float getSize(long length, String expectedOutput) {
+        switch (expectedOutput){
+            case "mb":
+//                converttomb();
+                break;
+            case "gb":
+                break;
+            default:
+
+        }
+    }
+
+    public static void main(String[] args) throws MalformedURLException {
+       String downloadUrl =  "https://az764295.vo.msecnd.net/stable/e2816fe719a4026ffa1ee0189dc89bdfdbafb164/VSCodeUserSetup-x64-1.75.0.exe";
 //        PrintAllProperties();
-                MainGUI mainGUI = new MainGUI();
+//                MainGUI mainGUI = new MainGUI();
+        getFileTotalSize(new URL(downloadUrl));
 //        startDownload(downloadUrl);
     }
 
