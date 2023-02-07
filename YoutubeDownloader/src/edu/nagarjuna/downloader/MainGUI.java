@@ -43,7 +43,7 @@ public class MainGUI {
         downloadProgress = new JProgressBar();
         downloadProgress.setMaximum(100);
         downloadProgress.setMinimum(0);
-        downloadProgress.setValue(50);
+
         jPanelOne = new JPanel();
         jPanelOne.add(textBoxLabel);
         jPanelOne.add(downloadUrlField);
@@ -72,13 +72,15 @@ public class MainGUI {
         URL url;
         try {
             url = new URL(downlaodUrl);
-            getFileTotalSize(url);
+            float fileTotalSize = getFileTotalSize(url);
             BufferedInputStream bufferedInputStream = new BufferedInputStream(url.openStream());
             FileOutputStream fileOutputStream = new FileOutputStream(downloadPath.toString());
             byte[] b = new byte[1024];
             int count;
-
+            int totalCount=0;
             while((count= bufferedInputStream.read(b,0,1024))!=-1){
+                totalCount+= count;
+                updateProgressBar(totalCount,fileTotalSize);
                 fileOutputStream.write(b,0,count);
             }
         }catch(MalformedURLException malformedURLException){
@@ -88,13 +90,20 @@ public class MainGUI {
         }
     }
 
-    private float getFileTotalSize(URL url,String expectedOutput) {
+    private void updateProgressBar(int totalCount, float fileTotalSize) {
+        int percentageDownloaded = (int) ((totalCount/fileTotalSize) * 0.1);
+        SwingUtilities.invokeLater(()-> {
+                downloadProgress.setValue(percentageDownloaded);
+        });
+    }
+
+    private float getFileTotalSize(URL url) {
         //expectedoutput = mb, kb, gb
         HttpURLConnection httpURLConnection;
         try {
             httpURLConnection = (HttpURLConnection) url.openConnection();
             long length = httpURLConnection.getContentLengthLong();
-            return getSize(length,expectedOutput);
+            return length;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -111,13 +120,14 @@ public class MainGUI {
             default:
 
         }
+        return 0f;
     }
 
     public static void main(String[] args) throws MalformedURLException {
        String downloadUrl =  "https://az764295.vo.msecnd.net/stable/e2816fe719a4026ffa1ee0189dc89bdfdbafb164/VSCodeUserSetup-x64-1.75.0.exe";
 //        PrintAllProperties();
-//                MainGUI mainGUI = new MainGUI();
-        getFileTotalSize(new URL(downloadUrl));
+                MainGUI mainGUI = new MainGUI();
+//        getFileTotalSize(new URL(downloadUrl));
 //        startDownload(downloadUrl);
     }
 
