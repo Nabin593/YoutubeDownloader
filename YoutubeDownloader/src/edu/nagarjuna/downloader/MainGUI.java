@@ -3,6 +3,7 @@ package edu.nagarjuna.downloader;
 //import com.sun.tools.javac.Main;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.BufferedInputStream;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.Enumeration;
 import java.util.Properties;
 //import java.awt.event.ActionListener;
@@ -25,6 +27,10 @@ public class MainGUI {
     private JPanel jPanelOne;
     private JProgressBar downloadProgress;
 
+    private JTable jTable;
+    private JScrollPane jScrollPane;
+    private final String[] COLUMNS = {"name","download date","download url"};
+
     MainGUI(){
         loadGUIComponents();
     }
@@ -37,12 +43,18 @@ public class MainGUI {
         JButton downloadBtm = new JButton("Download");
         downloadBtm.addActionListener((ActionEvent e) ->{
             String userText = downloadUrlField.getText();
+            saveDataToDatabase();
             startDownload(userText);
             JOptionPane.showMessageDialog(jFrame,"User input : "+userText);
         });
         downloadProgress = new JProgressBar();
         downloadProgress.setMaximum(100);
         downloadProgress.setMinimum(0);
+
+        //inititating table
+        DefaultTableModel defaultTableModel = new DefaultTableModel(new Object[][]{},COLUMNS);
+        jTable = new JTable(defaultTableModel);
+        jScrollPane = new JScrollPane(jTable);
 
         jPanelOne = new JPanel();
         jPanelOne.add(textBoxLabel);
@@ -53,6 +65,8 @@ public class MainGUI {
         jFrame.add(jPanelOne);
         jFrame.add(downloadBtm);
         jFrame.add(downloadProgress);
+        //add table to the frame
+        jFrame.add(jScrollPane);
 
         jFrame.setLayout(new GridLayout(4,1));
 
@@ -60,15 +74,24 @@ public class MainGUI {
 
     }
 
+    private void saveDataToDatabase() {
+        String[] rowsToBeInserted = {"1","2","3"};
+        DefaultTableModel defaultTableModel = (DefaultTableModel) jTable.getModel();
+        defaultTableModel.addRow(rowsToBeInserted);
+    }
+
     public void startDownload(String downlaodUrl) {
         // String a = "abcd";
         // String b = "abcd"; b = "cde"
         // url : https://somewebsite.com/downlaods/idm.exe .substring(0,4)
+
         StringBuffer userHome = new StringBuffer(System.getProperty("user.home"));
         StringBuffer fileSeparator = new StringBuffer(System.getProperty("file.separator"));
         StringBuffer downloadPath = userHome.append(fileSeparator).append("Downloads").append(fileSeparator);
         downloadPath.append(downlaodUrl.substring(downlaodUrl.lastIndexOf("/")+1));
-
+        // someurl.com, downloads, 7:18, donwloading
+        // ohterurl.com, downloads, 8:20, failed, success
+//        DatabaseUtil.saveToDatabase(downlaodUrl,downloadPath, LocalDateTime.now());
         URL url;
         try {
             url = new URL(downlaodUrl);
@@ -91,7 +114,9 @@ public class MainGUI {
     }
 
     private void updateProgressBar(int totalCount, float fileTotalSize) {
-        int percentageDownloaded = (int) ((totalCount/fileTotalSize) * 0.1);
+        int percentageDownloaded = (int) ((totalCount/fileTotalSize) * 100);
+        // total 32kb > 32 mb
+        System.out.println("percentage downloaded "+(totalCount/fileTotalSize)*100);
         SwingUtilities.invokeLater(()-> {
                 downloadProgress.setValue(percentageDownloaded);
         });
