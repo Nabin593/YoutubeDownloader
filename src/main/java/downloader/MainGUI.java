@@ -1,4 +1,4 @@
-package edu.nagarjuna.downloader;
+package downloader;
 
 //import com.sun.tools.javac.Main;
 
@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Enumeration;
 import java.util.Properties;
@@ -43,7 +44,7 @@ public class MainGUI {
         JButton downloadBtm = new JButton("Download");
         downloadBtm.addActionListener((ActionEvent e) ->{
             String userText = downloadUrlField.getText();
-            saveDataToDatabase();
+            saveDataToDatabase(userText);
             startDownload(userText);
             JOptionPane.showMessageDialog(jFrame,"User input : "+userText);
         });
@@ -74,8 +75,16 @@ public class MainGUI {
 
     }
 
-    private void saveDataToDatabase() {
-        String[] rowsToBeInserted = {"1","2","3"};
+    private void saveDataToDatabase(String url) {
+        // nabin ->  nabin.substring(2) // abcd.com/uploads/something/abcd.txt ->12 -> url.substring(13)
+        String name = url.substring(url.lastIndexOf("/")+1);
+        String dateNow = LocalDateTime.now().toString();
+        try {
+            DatabaseUtil.saveToDatabase(name,dateNow,url);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        String[] rowsToBeInserted = {name,dateNow,url};
         DefaultTableModel defaultTableModel = (DefaultTableModel) jTable.getModel();
         defaultTableModel.addRow(rowsToBeInserted);
     }

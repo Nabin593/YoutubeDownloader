@@ -1,4 +1,4 @@
-package edu.nagarjuna.downloader;
+package downloader;
 
 //tried by me
 

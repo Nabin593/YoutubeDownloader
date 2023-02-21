@@ -1,4 +1,4 @@
-package edu.nagarjuna.downloader;
+package downloader;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

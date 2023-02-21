@@ -1,15 +1,14 @@
-package edu.nagarjuna.downloader;
+package downloader;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class DatabaseUtil {
-
+//    https://mvnrepository.com/artifact/mysql/mysql-connector-java/8.0.32
    // docker install _>
-    public static void saveToDatabase(String downlaodUrl) throws SQLException {
+//    https://mvnrepository.com/artifact/com.mysql/mysql-connector-j/8.0.32
+    public static void saveToDatabase(String name,String dateNow,String downlaodUrl) throws SQLException {
         // try catch -> try with resources
          final String INSERTSQL = "insert into download_information(name,download_url,download_date)" +
                 "values(?,?,?)";
@@ -18,9 +17,9 @@ public class DatabaseUtil {
 //            Statement -> DOESN'T CACHES QUERY, PRONE TO SQL INJECTION
             // 2MB
             PreparedStatement preparedStatement = connection.prepareStatement(INSERTSQL);
-            preparedStatement.setString(1, LocalDateTime.now()+ UUID.randomUUID().toString());
+            preparedStatement.setString(1, name);
             preparedStatement.setString(2, downlaodUrl); //extra characters used in sql injection is replaced with empty string
-            preparedStatement.setString(3, LocalDateTime.now().toString());
+            preparedStatement.setString(3, dateNow);
 
             boolean result = preparedStatement.execute();
             if (result) System.out.println("successfully added to database");
