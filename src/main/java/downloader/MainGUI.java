@@ -14,8 +14,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
 //import java.awt.event.ActionListener;
 
 public class MainGUI {
@@ -53,7 +56,7 @@ public class MainGUI {
         downloadProgress.setMinimum(0);
 
         //inititating table
-        DefaultTableModel defaultTableModel = new DefaultTableModel(new Object[][]{},COLUMNS);
+        DefaultTableModel defaultTableModel = new DefaultTableModel(getDownloadInformation(),COLUMNS);
         jTable = new JTable(defaultTableModel);
         jScrollPane = new JScrollPane(jTable);
 
@@ -72,6 +75,30 @@ public class MainGUI {
         jFrame.setLayout(new GridLayout(4,1));
 
         jFrame.setVisible(true);
+
+    }
+
+    private Object[][] getDownloadInformation() {
+        Object[][] databaseList;
+        //downloadInformation -> name, url, date
+        try {
+            java.util.List<DownloadInformation> downloadInformationList = DatabaseUtil.getAllDownloadInformation();
+            databaseList = new Object[downloadInformationList.size()][3];
+           List<Object[]> objects = downloadInformationList.stream()
+                    .map(e -> new Object[]{e.getName(), e.getDate(), e.getDownloadUrl()})
+                    .toList();
+
+           for(int i=0;i<objects.size();i++){
+               Object[] temp = objects.get(i);
+               for(int j=0;j<3;j++){
+                   databaseList[i][j]= temp[j];
+               }
+           }
+          return databaseList;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
